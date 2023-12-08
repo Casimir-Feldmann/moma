@@ -25,4 +25,57 @@
     <arg name="moveit_controller_manager" value="simple" />
   </include>
 
+
+  <!-- === POINTCLOUD FILTERING ===-->
+    <!-- Passthrough filter pointcloud -->
+    <node pkg="nodelet" type="nodelet" name="pcl_manager" args="manager" output="screen" />
+    <node pkg="nodelet" type="nodelet" name="passthrough_x" args="load pcl/PassThrough pcl_manager" output="screen">
+        <remap from="~input" to="/wrist_camera/depth/color/points" />
+        <remap from="~output" to="/pointcloud_passthrough_x/output"/>
+        <rosparam>
+            input_frame: world
+            output_frame: world
+            filter_field_name: x
+            filter_limit_min: 0.0
+            filter_limit_max: 1.0
+            filter_limit_negative: False
+        </rosparam>
+    </node>
+      
+    <!-- === PLANNING === -->
+    <!-- Workplane Navigator -->
+    <node  pkg="earth_moving_planner" type="workplane_navigator_node.py" name="work_plane_navigator" output="screen">
+        <remap from="/pointcloud" to="/pointcloud_passthrough_x/output"/>
+        <param name="hw_mode" value="True"/>
+        <param name="world_frame_id" value="world"/>
+        <param name="work_plane_id" value="work_plane"/>
+        <param name="rel_offset_sweep_tool_x"  value="-0.0"/>
+        <param name="ee_frame_id" value="panda_hand"/>
+        <param name="ee_default_height" value="0.7"/>
+        <param name="ee_hover_height" value="0.2"/>
+        <param name="ee_sweep_height" value="0.17"/>
+        <param name="plane_prior_support_x" value="0.5"/>
+        <param name="plane_prior_support_y" value="0.0"/>
+        <param name="plane_prior_support_z" value="0.2"/>
+        <param name="plane_prior_normal_x" value="0.0"/>
+        <param name="plane_prior_normal_y" value="0.0"/>
+        <param name="plane_prior_normal_z" value="1.0"/>
+        <!-- <param name="plane_tf_prior_tx_ty_tz_qx_qy_qz_qw" value="0.500, 0.000, 0.257, 0.005, 0.001, 0.000, 1.000"/>     -->
+        <param name="plane_tf_prior_tx_ty_tz_qx_qy_qz_qw" value="0.500, 0.000, 0.258, 0.006, 0.002, 0.000, 1.000"/>
+
+        <param name="default_ee_pos_x" value="0.294"/>
+        <param name="default_ee_pos_y" value="0.0"/>
+        <param name="default_ee_pos_z" value="0.697"/>
+        <param name="default_ee_rot_x" value="1.0"/> <!-- 0.998 -->
+        <param name="default_ee_rot_y" value="0.0"/> <!-- 0.008 -->
+        <param name="default_ee_rot_z" value="0.0"/> <!-- 0.068 -->
+        <param name="default_ee_rot_w" value="0.0"/> <!-- -0.002 -->
+        <param name="default_joints" value="0.11069495765655875, -0.7704503651740449, -0.05727262686621668, -2.09231212130764, -0.04326514073604195, 1.4599562236467996, 0.8276377559551246"/>
+        <param name="moveit_move_group" value="panda_manipulator"/>
+        <param name="vel_scale_move" value="1.0"/>
+        <param name="acc_scale_move" value="0.2"/>
+        <param name="plane_fit_ransac_inlier_distance" value="0.0001"/>
+        <param name="plane_fit_ransac_max_iterations" value="100000"/>
+    </node>
+
 </launch>

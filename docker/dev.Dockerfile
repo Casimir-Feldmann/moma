@@ -26,5 +26,8 @@ RUN scripts/install_drivers.sh
 # Run the gazebo simulation installation
 RUN scripts/install_simulation.sh
 
+# RUN pip install --no-cache-dir -r requirements.txt
+RUN scripts/install_python_packages.sh
+
 # Finally, build all the stuff we downloaded.
 RUN scripts/build_ros.sh
