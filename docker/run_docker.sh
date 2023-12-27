@@ -99,6 +99,7 @@ docker run -it --rm \
     --volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" \
     --env="XAUTHORITY=$XAUTH" \
     --volume="$XAUTH:$XAUTH" \
+    --gpus all \
     --net=host \
     --privileged \
     --name=$NAME \
